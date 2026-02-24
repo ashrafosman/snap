@@ -1,0 +1,23 @@
+# Databricks Apps configuration
+# https://docs.databricks.com/dev-tools/databricks-apps/app-runtime
+
+name: snap
+description: Executive Fiscal ROI — SNAP PER & Income Latency Dashboard
+
+# Run Streamlit on port 8080 (required by Databricks Apps)
+command:
+  - streamlit
+  - run
+  - app.py
+  - --server.port
+  - "8080"
+  - --server.address
+  - "0.0.0.0"
+  - --server.headless
+  - "true"
+
+# Optional: inject SQL warehouse or Lakebase when you add app resources in the UI.
+# env:
+#   DATABRICKS_WAREHOUSE_ID:
+#     valueFrom: { type: workspaceConfig, key: sql_warehouse_id }
+#   USE_MOCK_BACKEND: "false"

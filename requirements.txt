@@ -1,0 +1,4 @@
+# Dashboard charts
+plotly>=5.18.0
+pandas>=2.0.0
+# Streamlit and databricks-sdk are pre-installed on Databricks Apps runtime.
