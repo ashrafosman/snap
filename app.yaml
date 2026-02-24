@@ -9,4 +9,10 @@ command: ['streamlit', 'run', 'app.py']
 
 # Real data: add a SQL warehouse as app resource in the workspace, then deploy.
 env:
-  USE_MOCK_BACKEND: "false"
+  - name: 'DATABRICKS_HOST'
+    value: 'adb-3438839487639471.11.azuredatabricks.net/'
+  - name: 'DATABRICKS_WAREHOUSE_ID'
+    value: 'a94a22f8652d85c1'
+  - name: 'USE_MOCK_BACKEND'
+    value: 'false'
+ 

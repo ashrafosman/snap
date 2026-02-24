@@ -56,10 +56,10 @@ def get_per_timeseries(region: str | None = None) -> pd.DataFrame:
 def get_income_latency_timeseries(region: str | None = None) -> pd.DataFrame:
     where = f" AND region = '{region}'" if region and region != "All" else ""
     q = f"""
-    SELECT month_start, region, median_latency_days, p90_latency_days
+    SELECT week_start AS month_start, region, median_latency_days, p90_latency_days
     FROM {_CATALOG}.{_SCHEMA}.gold_income_latency_timeseries
     WHERE 1=1 {where}
-    ORDER BY month_start
+    ORDER BY week_start
     """
     return _run_query(q)
 
