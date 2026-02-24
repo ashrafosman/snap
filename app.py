@@ -169,19 +169,25 @@ def main():
                     line=dict(color="#a855f7", width=2, dash="dash"),
                 )
             )
-            # Vertical lines: ingestion change & remediation (use ISO strings to avoid Timestamp arithmetic)
+            # Vertical lines: ingestion change & remediation (add_shape to avoid add_vline mean/sum on mixed types)
+            y_max_lat = max(lat_df["median_latency_days"].max(), lat_df["p90_latency_days"].max())
             for label, date_str in [
                 ("Ingestion change", INGESTION_CHANGE_DATE),
                 ("Remediation", REMEDIATION_DATE),
             ]:
                 d = pd.Timestamp(date_str).to_pydatetime()
                 if x_min <= d <= x_max:
-                    fig_lat.add_vline(
-                        x=date_str,
-                        line_dash="dot",
-                        line_color="orange",
-                        annotation_text=label,
-                        annotation_position="top",
+                    fig_lat.add_shape(
+                        type="line",
+                        x0=d, x1=d,
+                        y0=0, y1=y_max_lat,
+                        xref="x", yref="y",
+                        line=dict(color="orange", dash="dot", width=1.5),
+                    )
+                    fig_lat.add_annotation(
+                        x=d, y=y_max_lat, yref="y", xref="x",
+                        text=label, showarrow=False,
+                        yanchor="bottom", font=dict(size=10, color="orange"),
                     )
             fig_lat.update_layout(**CHART_LAYOUT)
             fig_lat.update_yaxes(title="Days", range=[0, None])
