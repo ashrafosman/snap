@@ -114,11 +114,13 @@ def main():
         if not per_df.empty:
             per_df = per_df.copy()
             per_df["month_start"] = pd.to_datetime(per_df["month_start"])
+            # Use list of dates to avoid pandas Timestamp + int in Plotly
+            x_vals = per_df["month_start"].dt.to_pydatetime()
             fig_per = go.Figure()
             fig_per.add_trace(
                 go.Scatter(
-                    x=per_df["month_start"],
-                    y=per_df["per_rate"],
+                    x=x_vals,
+                    y=per_df["per_rate"].tolist(),
                     mode="lines",
                     name="PER %",
                     line=dict(color="#3b82f6", width=2),
@@ -144,11 +146,15 @@ def main():
         if not lat_df.empty:
             lat_df = lat_df.copy()
             lat_df["month_start"] = pd.to_datetime(lat_df["month_start"])
+            # Use list of dates to avoid pandas Timestamp + int in Plotly
+            x_vals = lat_df["month_start"].dt.to_pydatetime()
+            x_min = lat_df["month_start"].min().to_pydatetime()
+            x_max = lat_df["month_start"].max().to_pydatetime()
             fig_lat = go.Figure()
             fig_lat.add_trace(
                 go.Scatter(
-                    x=lat_df["month_start"],
-                    y=lat_df["median_latency_days"],
+                    x=x_vals,
+                    y=lat_df["median_latency_days"].tolist(),
                     mode="lines",
                     name="Median",
                     line=dict(color="#3b82f6", width=2),
@@ -156,22 +162,22 @@ def main():
             )
             fig_lat.add_trace(
                 go.Scatter(
-                    x=lat_df["month_start"],
-                    y=lat_df["p90_latency_days"],
+                    x=x_vals,
+                    y=lat_df["p90_latency_days"].tolist(),
                     mode="lines",
                     name="P90",
                     line=dict(color="#a855f7", width=2, dash="dash"),
                 )
             )
-            # Vertical lines: ingestion change & remediation
+            # Vertical lines: ingestion change & remediation (use ISO strings to avoid Timestamp arithmetic)
             for label, date_str in [
                 ("Ingestion change", INGESTION_CHANGE_DATE),
                 ("Remediation", REMEDIATION_DATE),
             ]:
-                d = pd.Timestamp(date_str)
-                if lat_df["month_start"].min() <= d <= lat_df["month_start"].max():
+                d = pd.Timestamp(date_str).to_pydatetime()
+                if x_min <= d <= x_max:
                     fig_lat.add_vline(
-                        x=d,
+                        x=date_str,
                         line_dash="dot",
                         line_color="orange",
                         annotation_text=label,
