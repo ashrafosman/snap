@@ -113,32 +113,47 @@ def main():
         st.caption("Federal threshold at 6%.")
         if not per_df.empty:
             per_df = per_df.copy()
-            per_df["month_start"] = pd.to_datetime(per_df["month_start"])
-            if per_df["month_start"].dt.tz is not None:
-                per_df["month_start"] = per_df["month_start"].dt.tz_convert("UTC").dt.tz_localize(None)
-            # Use list of dates to avoid pandas Timestamp + int in Plotly
-            x_vals = per_df["month_start"].dt.to_pydatetime()
-            fig_per = go.Figure()
-            fig_per.add_trace(
-                go.Scatter(
-                    x=x_vals,
-                    y=per_df["per_rate"].tolist(),
-                    mode="lines",
-                    name="PER %",
-                    line=dict(color="#3b82f6", width=2),
+            # Resolve rate column (table may have "per_rate" or ".00 per_rate" etc.)
+            rate_col = "per_rate"
+            if rate_col not in per_df.columns:
+                candidates = [c for c in per_df.columns if "per_rate" in str(c).lower()]
+                rate_col = candidates[0] if candidates else None
+            if rate_col is None:
+                st.warning("PER table missing column `per_rate`. Columns: " + ", ".join(per_df.columns.tolist()))
+            else:
+                per_df["per_rate"] = pd.to_numeric(per_df[rate_col], errors="coerce").fillna(0)
+                # Table stores decimal (0.06255 = 6.255%) — scale to % for chart
+                if per_df["per_rate"].max() > 0 and per_df["per_rate"].max() < 1:
+                    per_df["per_rate"] = per_df["per_rate"] * 100
+                per_df["month_start"] = pd.to_datetime(per_df["month_start"])
+                if per_df["month_start"].dt.tz is not None:
+                    per_df["month_start"] = per_df["month_start"].dt.tz_convert("UTC").dt.tz_localize(None)
+                # Use list of dates to avoid pandas Timestamp + int in Plotly
+                x_vals = per_df["month_start"].dt.to_pydatetime()
+                fig_per = go.Figure()
+                fig_per.add_trace(
+                    go.Scatter(
+                        x=x_vals,
+                        y=per_df["per_rate"].tolist(),
+                        mode="lines",
+                        name="PER %",
+                        line=dict(color="#3b82f6", width=2),
+                    )
                 )
-            )
-            fig_per.add_hline(
-                y=PER_THRESHOLD,
-                line_dash="dash",
-                line_color="red",
-                annotation_text="Above Threshold",
-                annotation_position="top right",
-            )
-            fig_per.update_layout(**CHART_LAYOUT)
-            fig_per.update_yaxes(title="%", range=[0, None])
-            fig_per.update_xaxes(title="")
-            st.plotly_chart(fig_per, use_container_width=True)
+                fig_per.add_hline(
+                    y=PER_THRESHOLD,
+                    line_dash="dash",
+                    line_color="red",
+                    annotation_text="Above Threshold",
+                    annotation_position="top right",
+                )
+                fig_per.update_layout(**CHART_LAYOUT)
+                fig_per.update_yaxes(title="%", range=[0, None])
+                fig_per.update_xaxes(title="")
+                st.plotly_chart(fig_per, use_container_width=True)
+                with st.expander("PER data check"):
+                    st.caption("Columns: " + ", ".join(per_df.columns.tolist()))
+                    st.dataframe(per_df.head(10), use_container_width=True)
         else:
             st.info("No PER time series data.")
 
