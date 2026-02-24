@@ -114,6 +114,8 @@ def main():
         if not per_df.empty:
             per_df = per_df.copy()
             per_df["month_start"] = pd.to_datetime(per_df["month_start"])
+            if per_df["month_start"].dt.tz is not None:
+                per_df["month_start"] = per_df["month_start"].dt.tz_convert("UTC").dt.tz_localize(None)
             # Use list of dates to avoid pandas Timestamp + int in Plotly
             x_vals = per_df["month_start"].dt.to_pydatetime()
             fig_per = go.Figure()
@@ -146,6 +148,9 @@ def main():
         if not lat_df.empty:
             lat_df = lat_df.copy()
             lat_df["month_start"] = pd.to_datetime(lat_df["month_start"])
+            # Normalize to naive so we can compare with date markers (avoid offset-naive vs offset-aware)
+            if lat_df["month_start"].dt.tz is not None:
+                lat_df["month_start"] = lat_df["month_start"].dt.tz_convert("UTC").dt.tz_localize(None)
             # Use list of dates to avoid pandas Timestamp + int in Plotly
             x_vals = lat_df["month_start"].dt.to_pydatetime()
             x_min = lat_df["month_start"].min().to_pydatetime()
