@@ -68,8 +68,8 @@ def get_roi_scenario(target_per: float) -> dict:
     q = f"""
     SELECT per_rate_projected, projected_penalty_exposure_usd
     FROM {_CATALOG}.{_SCHEMA}.gold_snap_roi_scenarios
-    WHERE target_per = {target_per}
-    ORDER BY scenario_date DESC
+    WHERE per_rate_projected = {target_per}
+    ORDER BY month_start DESC
     LIMIT 1
     """
     df = _run_query(q)
