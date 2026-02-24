@@ -18,7 +18,7 @@ Streamlit **Databricks App** that tracks SNAP Payment Error Rate (PER) trends, i
 | `gold_snap_roi_scenarios` | per_rate_projected, projected_penalty_exposure_usd (by target PER) |
 | `gold_income_latency_timeseries` | month_start, region, median_latency_days, p90_latency_days |
 
-Set `SNAP_CATALOG` and `SNAP_SCHEMA` (default `main.default`) when using real data.
+**Default:** `ashraf.ashraf_osman_snap2`. Override with `SNAP_CATALOG` and `SNAP_SCHEMA` if needed.
 
 ## Run locally
 

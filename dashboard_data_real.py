@@ -1,14 +1,15 @@
 """
 Real data layer: queries gold_snap_per_timeseries, gold_snap_roi_scenarios, gold_income_latency_timeseries.
-Set DATABRICKS_WAREHOUSE_ID and optionally SNAP_CATALOG, SNAP_SCHEMA in app resources.
+Default: catalog ashraf, schema ashraf_osman_snap2. Set DATABRICKS_WAREHOUSE_ID in app resources.
+Override with SNAP_CATALOG, SNAP_SCHEMA if needed.
 """
 import os
 import pandas as pd
 from databricks.sdk.core import Config
 from databricks import sql
 
-_CATALOG = os.getenv("SNAP_CATALOG", "main")
-_SCHEMA = os.getenv("SNAP_SCHEMA", "default")
+_CATALOG = os.getenv("SNAP_CATALOG", "ashraf")
+_SCHEMA = os.getenv("SNAP_SCHEMA", "ashraf_osman_snap2")
 
 
 def _get_conn():
