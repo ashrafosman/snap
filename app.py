@@ -66,15 +66,19 @@ def main():
         region = st.selectbox("Region", regions, key="region", label_visibility="collapsed")
         st.caption("Region breakdown")
 
-    # KPIs
+    # KPIs (scale PER from decimal to % if table stores 0.06 = 6%)
     kpi = data.get_kpi_summary(region if region != "All" else None)
+    current_per = float(kpi["current_per"])
+    delta_pp = float(kpi["per_delta_pp"])
+    if 0 < current_per < 1:
+        current_per = current_per * 100
+        delta_pp = delta_pp * 100
     c1, c2, c3, c4 = st.columns(4)
     with c1:
-        delta = kpi["per_delta_pp"]
         st.metric(
             "CURRENT PER RATE",
-            f"{kpi['current_per']}%",
-            f"{delta:+.2f}pp",
+            f"{current_per:.1f}%",
+            f"{delta_pp:+.2f}pp",
             delta_color="inverse",
         )
         st.caption("Target: 5.8%")
